@@ -13,9 +13,9 @@
 
  I wanted to support 3 syntaxes:
 
- message[10] : Where 10 is the key of the field in the database.
- message["Name"] : So here we don't know the key - but we know the name.
- message.Name : This is almost just for fun, but it does clean up the code nicely....
+ * message[10] : Where 10 is the key of the field in the database.
+ * message["Name"] : So here we don't know the key - but we know the name.
+ * message.Name : This is almost just for fun, but it does clean up the code nicely....
 
 
  This code is NOT production ready. For one thing - it doesn't handle missing fields in the Json gracefully at all. 
