@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Dynamic;
 
-
 public class Message : DynamicObject
 {
     private readonly JObject _jObject;
@@ -38,12 +37,7 @@ public class Message : DynamicObject
     {
         get
         {
-            if (_mappingsById.TryGetValue(id, out var mapping))
-            {
-                return this[mapping.Name];
-            }
-
-            return null; // Return null if the ID does not match any mapping.
+            return GetByMappingId(id);
         }
     }
 
@@ -51,21 +45,68 @@ public class Message : DynamicObject
     {
         if (_mappingsByName.TryGetValue(name, out var mapping))
         {
-            if (mapping.NestedMappings.Any())
-            {
-                result = GetOrCreateCachedValue(name, () =>
-                    _jObject.SelectTokens(mapping.JsonPath).ToList()
-                    .Select(item => CreateNestedObject(item, mapping.NestedMappings)).ToList());
-            }
-            else
-            {
-                result = GetOrCreateCachedValue(mapping.JsonPath, () => GetValueByPath(mapping.JsonPath, mapping.Type));
-            }
+            result = GetValueByMapping(mapping);
             return true;
         }
 
         result = null; // Ensure null is returned if there is no mapping found.
         return false;
+    }
+
+    private object GetByMappingId(int id)
+    {
+        if (_mappingsById.TryGetValue(id, out var mapping))
+        {
+            return GetValueByMapping(mapping);
+        }
+        else
+        {
+            foreach (var parentMapping in _mappingsById.Values)
+            {
+                var result = FindNestedMappingById(parentMapping, id);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+        }
+        return null; // Return null if no mapping with the given ID is found.
+    }
+
+    private object FindNestedMappingById(Mapping parentMapping, int id)
+    {
+        foreach (var nestedMapping in parentMapping.NestedMappings)
+        {
+            if (nestedMapping.Id == id)
+            {
+                return GetValueByMapping(nestedMapping);
+            }
+            else
+            {
+                var result = FindNestedMappingById(nestedMapping, id);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+        }
+        return null;
+    }
+
+    private object GetValueByMapping(Mapping mapping)
+    {
+        return GetOrCreateCachedValue(mapping.JsonPath, () =>
+        {
+            if (mapping.NestedMappings.Any())
+            {
+                return _jObject.SelectTokens(mapping.JsonPath).ToList()
+                    .Select(item => CreateNestedObject(item, mapping.NestedMappings)).ToList();
+            }
+            else
+            {
+                return GetValueByPath(mapping.JsonPath, mapping.Type);
+            }
+        });
     }
 
     private object GetOrCreateCachedValue(string key, Func<object> valueFactory)
@@ -96,7 +137,6 @@ public class Message : DynamicObject
         var token = _jObject.SelectToken(jsonPath);
         return token != null ? Convert.ChangeType(token.ToObject(type), type) : null;
     }
-
     public void PreloadAllMappings()
     {
         foreach (var mapping in _mappingsByName.Values)

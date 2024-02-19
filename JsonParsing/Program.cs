@@ -31,7 +31,7 @@ public class Program
         PrintTests.PrintPersonAndCarsByIdUsingDictionaryNumericSyntax(message);
 
         Console.WriteLine(); Console.WriteLine(message);
-        Console.WriteLine("DYNAMIC NAMED SYNTAX");
+        Console.WriteLine("DYNAMIC NAMED SYNTAX (nested doesnt work yet)");
         PrintTests.PrintPersonAndCarsByNameUsingDynamicSyntax(message);
     }
 }
