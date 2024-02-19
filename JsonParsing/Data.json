@@ -1,0 +1,36 @@
+{
+  "Person": {
+    "Name": "John Doe",
+    "Age": 35,
+    "Contact": {
+      "Email": "john.doe@example.com",
+      "Phone": "123-456-7890"
+    },
+    "Address": {
+      "Street": "1234 Elm Street",
+      "City": "Anytown",
+      "State": "Anystate",
+      "ZipCode": "12345"
+    },
+    "CarsOwned": [
+      {
+        "Make": "Toyota",
+        "Model": "Camry",
+        "Year": 2010,
+        "Color": "Silver"
+      },
+      {
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": 2015,
+        "Color": "Blue"
+      },
+      {
+        "Make": "Ford",
+        "Model": "Escape",
+        "Year": 2018,
+        "Color": "Black"
+      }
+    ]
+  }
+}
